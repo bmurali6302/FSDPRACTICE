@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="com.ebs.customer.serviceimpl.CustomerServiceImpl"/>
+    <fullyQualifiedTypeName name="jakarta.persistence.Id"/>
+    <fullyQualifiedTypeName name="org.springframework.data.jpa.repository.JpaRepository"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.service.AdminService"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    <fullyQualifiedTypeName name="org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.ExceptionHandler"/>
+    <fullyQualifiedTypeName name="org.springframework.http.ResponseEntity"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.exceptions.AdminNotRegisterException"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.dto.AdminDto"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestBody"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.entity.Admin"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.client.CustomerService"/>
+    <fullyQualifiedTypeName name="jakarta.validation.Valid"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.dto.CustomerDto"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.GetMapping"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.DeleteMapping"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.PutMapping"/>
+    <fullyQualifiedTypeName name="org.springframework.http.HttpStatus"/>
+    <fullyQualifiedTypeName name="org.springframework.cloud.openfeign.EnableFeignClients"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.dto.BillDto"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.client.BillService"/>
+    <fullyQualifiedTypeName name="com.ebs.customer.dto.BillDto"/>
+    <fullyQualifiedTypeName name="com.ebs.customer.client.BillService"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.dto.PaymentDto"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.client.PaymentService"/>
+    <fullyQualifiedTypeName name="org.springframework.cloud.openfeign.FeignClient"/>
+    <fullyQualifiedTypeName name="com.ebs.billing.dto.CustomerDto"/>
+    <fullyQualifiedTypeName name="java.time.LocalDateTime"/>
+    <fullyQualifiedTypeName name="com.ebs.billing.client.CustomerService"/>
+    <fullyQualifiedTypeName name="com.ebs.payment.client.BillService"/>
+    <fullyQualifiedTypeName name="com.ebs.payment.dto.BillDto"/>
+    <fullyQualifiedTypeName name="lombok.Data"/>
+    <fullyQualifiedTypeName name="lombok.NoArgsConstructor"/>
+    <fullyQualifiedTypeName name="lombok.AllArgsConstructor"/>
+    <fullyQualifiedTypeName name="com.ebs.customer.exception.InvalidAadharNumber"/>
+    <fullyQualifiedTypeName name="com.ebs.customer.exception.InvalidNameException"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestParam"/>
+    <fullyQualifiedTypeName name="com.ebs.admin.exceptions.InvalidEmailPasswordException"/>
+    <fullyQualifiedTypeName name="com.ebs.customer.entity.Customer"/>
+    <fullyQualifiedTypeName name="com.ebs.payment.excepion.PaymentNotFound"/>
+    <fullyQualifiedTypeName name="java.util.Optional"/>
+    <fullyQualifiedTypeName name="org.springframework.data.repository.query.Param"/>
+</qualifiedTypeNameHistroy>

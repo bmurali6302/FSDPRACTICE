@@ -1,0 +1,730 @@
+package com.ebs.customer;
+
+
+//
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//import static org.junit.jupiter.api.Assertions.assertThrows;
+//import static org.mockito.ArgumentMatchers.any;
+//import static org.mockito.Mockito.times;
+//import static org.mockito.Mockito.verify;
+//import static org.mockito.Mockito.when;
+//
+//import java.util.Arrays;
+//import java.util.List;
+//import java.util.Optional;
+//
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//import org.mockito.InjectMocks;
+//import org.mockito.Mock;
+//import org.mockito.MockitoAnnotations;
+//import org.modelmapper.ModelMapper;
+//import org.springframework.web.client.RestTemplate;
+//
+//import com.ebs.customer.dto.CustomerDto;
+//import com.ebs.customer.entity.Customer;
+//import com.ebs.customer.exception.CustomerAlreadyExistException;
+//import com.ebs.customer.exception.CustomerIdNotFound;
+//import com.ebs.customer.exception.InvalidDataException;
+//import com.ebs.customer.exception.InvalidEmailIdException;
+//import com.ebs.customer.exception.InvalidEmailPasswordException;
+//import com.ebs.customer.exception.InvalidPasswordException;
+//import com.ebs.customer.exception.PasswordMismatchException;
+//import com.ebs.customer.exception.UserIsNotRegisterException;
+//import com.ebs.customer.repository.CustomerRepository;
+//import com.ebs.customer.serviceimpl.CustomerServiceImpl;
+//
+//class CustomerServiceImplTest {
+//
+//    @Mock
+//    private CustomerRepository customerRepository;
+//
+//    @Mock
+//    private ModelMapper modelMapper;
+//
+//    @Mock
+//    private RestTemplate restTemplate;
+//
+//    @InjectMocks
+//    private CustomerServiceImpl customerService;
+//
+//    @BeforeEach
+//    public void setUp() {
+//        MockitoAnnotations.openMocks(this);
+//    }
+//
+//    // Tests for registerCustomer method
+//    @Test
+//     void testRegisterCustomer_CustomerAlreadyExists() {
+//        Customer customer = new Customer();
+//        customer.setEmailId("test@example.com");
+//
+//        when(customerRepository.findByEmailId(customer.getEmailId())).thenReturn(new Customer());
+//
+//        assertThrows(CustomerAlreadyExistException.class, () -> customerService.registerCustomer(customer));
+//    }
+//
+//    @Test
+//    void testRegisterCustomer_InvalidData() {
+//        Customer customer = new Customer();
+//        customer.setEmailId("");
+//        customer.setAddress("");
+//        customer.setFirstName("");
+//        customer.setLastName("");
+//        customer.setAdharNumber("");
+//        customer.setGender("");
+//        customer.setPassword("");
+//        customer.setMobileNumber("");
+//
+//        assertThrows(InvalidDataException.class, () -> customerService.registerCustomer(customer));
+//    }
+//
+//    @Test
+//    void testRegisterCustomer_InvalidEmailId() {
+//        Customer customer = new Customer();
+//        customer.setEmailId("invalidemail"); // invalid email format
+//        customer.setFirstName("John");
+//        customer.setLastName("Doe");
+//        customer.setAdharNumber("123456789012");
+//        customer.setGender("Male");
+//        customer.setPassword("Password1@");
+//        customer.setMobileNumber("9876543210");
+//        customer.setAddress("123 Test Street");
+//
+//        // Assuming the customer does not already exist
+//        when(customerRepository.findByEmailId(any(String.class))).thenReturn(null);
+//
+//        assertThrows(InvalidEmailIdException.class, () -> customerService.registerCustomer(customer));
+//    }
+//
+//    // similar tests for other invalid fields...
+//
+//    @Test
+//    void testRegisterCustomer_Success() {
+//        Customer customer = new Customer();
+//        customer.setEmailId("test@example.com");
+//        customer.setFirstName("John");
+//        customer.setLastName("Doe");
+//        customer.setAdharNumber("123456789012");
+//        customer.setGender("Male");
+//        customer.setPassword("Password1@");
+//        customer.setMobileNumber("9876543210");
+//        customer.setAddress("123 Test Street");
+//
+//        when(customerRepository.findByEmailId(customer.getEmailId())).thenReturn(null);
+//        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+//
+//        Customer result = customerService.registerCustomer(customer);
+//        assertEquals(customer, result);
+//    }
+//
+//
+//
+//    // Tests for loginCustomer method
+//    @Test
+//     void testLoginCustomer_Success() {
+//        String email = "test@example.com";
+//        String password = "Password1@";
+//
+//        Customer customer = new Customer();
+//        customer.setEmailId(email);
+//        customer.setPassword(password);
+//
+//        when(customerRepository.findByEmailId(email)).thenReturn(customer);
+//
+//        Customer result = customerService.loginCustomer(email, password);
+//        assertEquals(customer, result);
+//    }
+//
+//    @Test
+//     void testLoginCustomer_UserNotRegistered() {
+//        String email = "test@example.com";
+//        String password = "Password1@";
+//
+//        when(customerRepository.findByEmailId(email)).thenReturn(null);
+//
+//        assertThrows(UserIsNotRegisterException.class, () -> customerService.loginCustomer(email, password));
+//    }
+//
+//    @Test
+//     void testLoginCustomer_InvalidPassword() {
+//        String email = "test@example.com";
+//        String password = "Password1@";
+//
+//        Customer customer = new Customer();
+//        customer.setEmailId(email);
+//        customer.setPassword("WrongPassword");
+//
+//        when(customerRepository.findByEmailId(email)).thenReturn(customer);
+//
+//        assertThrows(InvalidEmailPasswordException.class, () -> customerService.loginCustomer(email, password));
+//    }
+//
+//    // Tests for editCustomer method
+//    @Test
+//    void testEditCustomer_Success() {
+//        Long customerId = 1L;
+//        Customer customer = new Customer();
+//        customer.setFirstName("NewName");
+//
+//        Customer existingCustomer = new Customer();
+//        when(customerRepository.findById(customerId)).thenReturn(Optional.of(existingCustomer));
+//        when(customerRepository.save(any(Customer.class))).thenReturn(existingCustomer);
+//
+//        String result = customerService.editCustomer(customerId, customer);
+//        assertEquals("Customer details updated successfully", result);
+//    }
+//
+//    @Test
+//     void testEditCustomer_CustomerNotFound() {
+//        Long customerId = 1L;
+//        Customer customer = new Customer();
+//
+//        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+//
+//        assertThrows(CustomerIdNotFound.class, () -> customerService.editCustomer(customerId, customer));
+//    }
+//
+//    // Tests for forgotPassword method
+//    @Test
+//     void testForgotPassword_Success() {
+//        CustomerDto customerDto = new CustomerDto();
+//        customerDto.setEmailId("test@example.com");
+//        customerDto.setPassword("NewPassword1@");
+//        customerDto.setConfirmPassword("NewPassword1@");
+//
+//        Customer customer = new Customer();
+//        customer.setEmailId("test@example.com");
+//
+//        when(customerRepository.findByEmailId(customerDto.getEmailId())).thenReturn(customer);
+//        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+//
+//        String result = customerService.forgotPassword(customerDto);
+//        assertEquals("Password Reset Succesfully", result);
+//    }
+//
+//    @Test
+//     void testForgotPassword_UserNotRegistered() {
+//        CustomerDto customerDto = new CustomerDto();
+//        customerDto.setEmailId("test@example.com");
+//
+//        when(customerRepository.findByEmailId(customerDto.getEmailId())).thenReturn(null);
+//
+//        assertThrows(UserIsNotRegisterException.class, () -> customerService.forgotPassword(customerDto));
+//    }
+//
+//    @Test
+//    void testForgotPassword_InvalidPassword() {
+//        CustomerDto customerDto = new CustomerDto();
+//        customerDto.setEmailId("test@example.com");
+//        customerDto.setPassword("short");
+//
+//        Customer customer = new Customer();
+//        customer.setEmailId("test@example.com");
+//
+//        when(customerRepository.findByEmailId(customerDto.getEmailId())).thenReturn(customer);
+//
+//        assertThrows(InvalidPasswordException.class, () -> customerService.forgotPassword(customerDto));
+//    }
+//
+//    @Test
+//    void testForgotPassword_PasswordMismatch() {
+//        CustomerDto customerDto = new CustomerDto();
+//        customerDto.setEmailId("test@example.com");
+//        customerDto.setPassword("Password1@");
+//        customerDto.setConfirmPassword("DifferentPassword");
+//
+//        Customer customer = new Customer();
+//        customer.setEmailId("test@example.com");
+//
+//        when(customerRepository.findByEmailId(customerDto.getEmailId())).thenReturn(customer);
+//
+//        assertThrows(PasswordMismatchException.class, () -> customerService.forgotPassword(customerDto));
+//    }
+//
+//    // Tests for deleteCustomer method
+//    @Test
+//    void testDeleteCustomer_Success() {
+//        Long customerId = 1L;
+//
+//        when(customerRepository.existsById(customerId)).thenReturn(true);
+//
+//        String result = customerService.deleteCustomer(customerId);
+//        assertEquals("Customer deleted successfully", result);
+//
+//        verify(customerRepository, times(1)).deleteById(customerId);
+//    }
+//
+////    @Test
+////     void testDeleteCustomer_CustomerNotFound() {
+////        Long customerId = 1L;
+////
+////        when(customerRepository.existsById(customerId)).thenReturn(false);
+////
+////        String result = customerService.deleteCustomer(customerId);
+////        assertEquals( + customerId + " not found", result);
+////
+////        verify(customerRepository, never()).deleteById(customerId);
+////    }
+//
+//    // Tests for getAllCustomer method
+//    @Test
+//     void testGetAllCustomer() {
+//        Customer customer1 = new Customer();
+//        Customer customer2 = new Customer();
+//
+//        when(customerRepository.findAll()).thenReturn(Arrays.asList(customer1, customer2));
+//
+//        List<Customer> result = customerService.getAllCustomer();
+//        assertEquals(2, result.size());
+//        assertEquals(customer1, result.get(0));
+//        assertEquals(customer2, result.get(1));
+//    }
+//
+//   
+//    @Test
+//     void testSearchCustomerByCustomerId_CustomerNotFound() {
+//        Long customerId = 1L;
+//
+//        when(customerRepository.existsById(customerId)).thenReturn(false);
+//
+//        assertThrows(CustomerIdNotFound.class, () -> customerService.searchCustomerByCustomerId(customerId));
+//    }
+//
+//    
+//
+//  
+//}
+
+//	
+//	
+//import static org.junit.jupiter.api.Assertions.*;
+//import static org.mockito.ArgumentMatchers.any;
+//import static org.mockito.Mockito.*;
+//
+//import java.util.Optional;
+//import java.util.List;
+//import java.util.Collections;
+//
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.extension.ExtendWith;
+//import org.mockito.InjectMocks;
+//import org.mockito.Mock;
+//import org.mockito.junit.jupiter.MockitoExtension;
+//
+//import com.ebs.customer.dto.CustomerDto;
+//import com.ebs.customer.entity.Customer;
+//import com.ebs.customer.exception.*;
+//import com.ebs.customer.repository.CustomerRepository;
+//import com.ebs.customer.serviceimpl.CustomerServiceImpl;
+//
+//@ExtendWith(MockitoExtension.class)
+//class CustomerServiceImplTest {
+//
+//    @Mock
+//    private CustomerRepository customerRepository;
+//
+//    @InjectMocks
+//    private CustomerServiceImpl customerServiceImpl;
+//
+//    private Customer customer;
+//    private CustomerDto customerDto;
+//
+//    @BeforeEach
+//     void setUp() {
+//        customer = new Customer();
+//        customer.setCustomerId(1L);
+//        customer.setEmailId("test@example.com");
+//        customer.setFirstName("John");
+//        customer.setLastName("Doe");
+//        customer.setAdharNumber("123456789012");
+//        customer.setGender("Male");
+//        customer.setPassword("Password@123");
+//        customer.setMobileNumber("9876543210");
+//        customer.setAddress("Test Address");
+//
+//        customerDto = new CustomerDto();
+//        customerDto.setEmailId("test@example.com");
+//        customerDto.setPassword("Password@123");
+//        customerDto.setConfirmPassword("Password@123");
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_success() {
+//        when(customerRepository.findByEmailId(anyString())).thenReturn(null);
+//        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+//
+//        Customer result = customerServiceImpl.registerCustomer(customer);
+//        assertNotNull(result);
+//        verify(customerRepository, times(1)).findByEmailId(anyString());
+//        verify(customerRepository, times(1)).save(any(Customer.class));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_customerAlreadyExist() {
+//        when(customerRepository.findByEmailId(anyString())).thenReturn(customer);
+//
+//        assertThrows(CustomerAlreadyExistException.class, () -> customerServiceImpl.registerCustomer(customer));
+//        verify(customerRepository, times(1)).findByEmailId(anyString());
+//        verify(customerRepository, times(0)).save(any(Customer.class));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_invalidData() {
+//        customer.setAddress("");
+//        assertThrows(InvalidDataException.class, () -> customerServiceImpl.registerCustomer(customer));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_invalidEmail() {
+//        customer.setEmailId("invalidEmail");
+//        assertThrows(InvalidEmailIdException.class, () -> customerServiceImpl.registerCustomer(customer));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_invalidFirstName() {
+//        customer.setFirstName("John123");
+//        assertThrows(InvalidNameException.class, () -> customerServiceImpl.registerCustomer(customer));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_invalidLastName() {
+//        customer.setLastName("Doe123");
+//        assertThrows(InvalidNameException.class, () -> customerServiceImpl.registerCustomer(customer));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_invalidAadharNumber() {
+//        customer.setAdharNumber("123");
+//        assertThrows(InvalidAadharNumber.class, () -> customerServiceImpl.registerCustomer(customer));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_invalidGender() {
+//        customer.setGender("Other");
+//        assertThrows(InvalidGenderException.class, () -> customerServiceImpl.registerCustomer(customer));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_invalidPassword() {
+//        customer.setPassword("pass");
+//        assertThrows(InvalidPasswordException.class, () -> customerServiceImpl.registerCustomer(customer));
+//    }
+//
+//    @Test
+//     void testRegisterCustomer_invalidMobileNumber() {
+//        customer.setMobileNumber("12345");
+//        assertThrows(InvalidMobileNumberException.class, () -> customerServiceImpl.registerCustomer(customer));
+//    }
+//
+//    @Test
+//     void testLoginCustomer_success() {
+//        when(customerRepository.findByEmailId(anyString())).thenReturn(customer);
+//
+//        Customer result = customerServiceImpl.loginCustomer("test@example.com", "Password@123");
+//        assertNotNull(result);
+//    }
+//
+//    @Test
+//     void testLoginCustomer_userNotRegistered() {
+//        when(customerRepository.findByEmailId(anyString())).thenReturn(null);
+//
+//        assertThrows(UserIsNotRegisterException.class, () -> customerServiceImpl.loginCustomer("test@example.com", "Password@123"));
+//    }
+//
+//    @Test
+//     void testLoginCustomer_invalidPassword() {
+//        when(customerRepository.findByEmailId(anyString())).thenReturn(customer);
+//
+//        assertThrows(InvalidEmailPasswordException.class, () -> customerServiceImpl.loginCustomer("test@example.com", "wrongPassword"));
+//    }
+//
+//    @Test
+//     void testEditCustomer_success() {
+//        when(customerRepository.findById(anyLong())).thenReturn(Optional.of(customer));
+//        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+//
+//        String result = customerServiceImpl.editCustomer(1L, customer);
+//        assertEquals("Customer details updated successfully", result);
+//    }
+//
+//    @Test
+//     void testEditCustomer_customerNotFound() {
+//        when(customerRepository.findById(anyLong())).thenReturn(Optional.empty());
+//
+//        assertThrows(CustomerIdNotFound.class, () -> customerServiceImpl.editCustomer(1L, customer));
+//    }
+//
+//    @Test
+//     void testForgotPassword_success() {
+//        when(customerRepository.findByEmailId(anyString())).thenReturn(customer);
+//        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+//
+//        String result = customerServiceImpl.forgotPassword(customerDto);
+//        assertEquals("Password Reset Succesfully", result);
+//    }
+//
+//    @Test
+//     void testForgotPassword_userNotRegistered() {
+//        when(customerRepository.findByEmailId(anyString())).thenReturn(null);
+//
+//        assertThrows(UserIsNotRegisterException.class, () -> customerServiceImpl.forgotPassword(customerDto));
+//    }
+//
+//    @Test
+//     void testDeleteCustomer_success() {
+//        when(customerRepository.existsById(anyLong())).thenReturn(true);
+//        doNothing().when(customerRepository).deleteById(anyLong());
+//
+//        String result = customerServiceImpl.deleteCustomer(1L);
+//        assertEquals("Customer deleted successfully", result);
+//    }
+//
+//    
+//
+//    @Test
+//     void testGetAllCustomer() {
+//        when(customerRepository.findAll()).thenReturn(Collections.singletonList(customer));
+//
+//        List<Customer> result = customerServiceImpl.getAllCustomer();
+//        assertEquals(1, result.size());
+//        verify(customerRepository, times(1)).findAll();
+//    }
+//
+//    @Test
+//     void testSearchCustomerByCustomerId_success() {
+//        when(customerRepository.existsById(anyLong())).thenReturn(true);
+//        when(customerRepository.findById(anyLong())).thenReturn(Optional.of(customer));
+//
+//        CustomerDto result = customerServiceImpl.searchCustomerByCustomerId(1L);
+//        assertNotNull(result);
+//        assertEquals(customer.getCustomerId(), result.getCustomerId());
+//    }
+//
+//    @Test
+//     void testSearchCustomerByCustomerId_customerNotFound() {
+//        when(customerRepository.existsById(anyLong())).thenReturn(false);
+//
+//        assertThrows(CustomerIdNotFound.class, () -> customerServiceImpl.searchCustomerByCustomerId(1L));
+//    }
+//
+//
+//    @Test
+//    void testForgotPassword_invalidPassword() {
+//        customerDto.setPassword("short");
+//        customerDto.setConfirmPassword("short");
+//        when(customerRepository.findByEmailId(anyString())).thenReturn(customer);
+//
+//        Exception exception = assertThrows(InvalidPasswordException.class, () -> customerServiceImpl.forgotPassword(customerDto));
+//        assertEquals("Invalid_password", exception.getMessage());
+//        verify(customerRepository, times(1)).findByEmailId(anyString());
+//        verify(customerRepository, times(0)).save(any(Customer.class));
+//    }
+//
+//}
+
+package com.ebs.customer.serviceimpl;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.ebs.customer.dto.CustomerDto;
+import com.ebs.customer.entity.Customer;
+import com.ebs.customer.exception.CustomerAlreadyExistException;
+import com.ebs.customer.exception.CustomerIdNotFound;
+import com.ebs.customer.exception.InvalidEmailPasswordException;
+import com.ebs.customer.exception.UserIsNotRegisterException;
+import com.ebs.customer.repository.CustomerRepository;
+import com.ebs.customer.serviceimpl.CustomerServiceImpl;
+
+@ExtendWith(MockitoExtension.class)
+class CustomerServiceImplTest {
+
+    @Mock
+    private CustomerRepository customerRepository;
+
+    @InjectMocks
+    private CustomerServiceImpl customerService;
+
+    private Customer customer;
+    private CustomerDto customerDto;
+
+    @BeforeEach
+    void setUp() {
+        customer = new Customer();
+        customer.setCustomerId(1L);
+        customer.setFirstName("John");
+        customer.setLastName("Doe");
+        customer.setEmailId("john.doe@example.com");
+        customer.setPassword("Password@123");
+        customer.setAdharNumber("123456789012");
+        customer.setGender("Male");
+        customer.setMobileNumber("9876543210");
+        customer.setAddress("123 Main St");
+
+        customerDto = new CustomerDto();
+        customerDto.setEmailId("john.doe@example.com");
+        customerDto.setPassword("NewPassword@123");
+        customerDto.setConfirmPassword("NewPassword@123");
+    }
+
+    @Test
+    void registerCustomer_ShouldRegisterCustomer() {
+        when(customerRepository.findByEmailId(customer.getEmailId())).thenReturn(null);
+        when(customerRepository.save(customer)).thenReturn(customer);
+
+        Customer registeredCustomer = customerService.registerCustomer(customer);
+
+        assertNotNull(registeredCustomer);
+        assertEquals(customer.getEmailId(), registeredCustomer.getEmailId());
+        verify(customerRepository, times(1)).findByEmailId(customer.getEmailId());
+        verify(customerRepository, times(1)).save(customer);
+    }
+
+    @Test
+    void registerCustomer_ShouldThrowCustomerAlreadyExistException() {
+        when(customerRepository.findByEmailId(customer.getEmailId())).thenReturn(customer);
+
+        assertThrows(CustomerAlreadyExistException.class, () -> customerService.registerCustomer(customer));
+        verify(customerRepository, times(1)).findByEmailId(customer.getEmailId());
+        verify(customerRepository, never()).save(any(Customer.class));
+    }
+
+    @Test
+    void loginCustomer_ShouldReturnCustomer() {
+        when(customerRepository.findByEmailId(customer.getEmailId())).thenReturn(customer);
+
+        Customer loggedInCustomer = customerService.loginCustomer(customer.getEmailId(), customer.getPassword());
+
+        assertNotNull(loggedInCustomer);
+        assertEquals(customer.getEmailId(), loggedInCustomer.getEmailId());
+        verify(customerRepository, times(1)).findByEmailId(customer.getEmailId());
+    }
+
+    @Test
+    void loginCustomer_ShouldThrowUserIsNotRegisterException() {
+        when(customerRepository.findByEmailId(customer.getEmailId())).thenReturn(null);
+
+        assertThrows(UserIsNotRegisterException.class, () -> customerService.loginCustomer(customer.getEmailId(), customer.getPassword()));
+        verify(customerRepository, times(1)).findByEmailId(customer.getEmailId());
+    }
+
+    @Test
+    void loginCustomer_ShouldThrowInvalidEmailPasswordException() {
+        when(customerRepository.findByEmailId(customer.getEmailId())).thenReturn(customer);
+
+        assertThrows(InvalidEmailPasswordException.class, () -> customerService.loginCustomer(customer.getEmailId(), "wrongPassword"));
+        verify(customerRepository, times(1)).findByEmailId(customer.getEmailId());
+    }
+
+    @Test
+    void editCustomer_ShouldUpdateCustomer() {
+        when(customerRepository.findById(customer.getCustomerId())).thenReturn(Optional.of(customer));
+
+        String response = customerService.editCustomer(customer.getCustomerId(), customer);
+
+        assertEquals("Customer details updated successfully", response);
+        verify(customerRepository, times(1)).findById(customer.getCustomerId());
+        verify(customerRepository, times(1)).save(customer);
+    }
+
+    @Test
+    void editCustomer_ShouldThrowCustomerIdNotFoundException() {
+        when(customerRepository.findById(customer.getCustomerId())).thenReturn(Optional.empty());
+
+        assertThrows(CustomerIdNotFound.class, () -> customerService.editCustomer(customer.getCustomerId(), customer));
+        verify(customerRepository, times(1)).findById(customer.getCustomerId());
+    }
+
+    @Test
+    void forgotPassword_ShouldResetPassword() {
+        when(customerRepository.findByEmailId(customerDto.getEmailId())).thenReturn(customer);
+
+        String response = customerService.forgotPassword(customerDto);
+
+        assertEquals("Password Reset Succesfully", response);
+        verify(customerRepository, times(1)).findByEmailId(customerDto.getEmailId());
+        verify(customerRepository, times(1)).save(customer);
+    }
+
+    @Test
+    void forgotPassword_ShouldThrowUserIsNotRegisterException() {
+        when(customerRepository.findByEmailId(customerDto.getEmailId())).thenReturn(null);
+
+        assertThrows(UserIsNotRegisterException.class, () -> customerService.forgotPassword(customerDto));
+        verify(customerRepository, times(1)).findByEmailId(customerDto.getEmailId());
+    }
+
+    @Test
+    void deleteCustomer_ShouldDeleteCustomer() {
+        when(customerRepository.existsById(customer.getCustomerId())).thenReturn(true);
+
+        String response = customerService.deleteCustomer(customer.getCustomerId());
+
+        assertEquals("Customer deleted successfully", response);
+        verify(customerRepository, times(1)).existsById(customer.getCustomerId());
+        verify(customerRepository, times(1)).deleteById(customer.getCustomerId());
+    }
+
+    @Test
+    void deleteCustomer_ShouldReturnCustomerIdNotFound() {
+        when(customerRepository.existsById(customer.getCustomerId())).thenReturn(false);
+
+        String response = customerService.deleteCustomer(customer.getCustomerId());
+
+        assertEquals("Customer with ID1not_found", response);
+        verify(customerRepository, times(1)).existsById(customer.getCustomerId());
+        verify(customerRepository, never()).deleteById(customer.getCustomerId());
+    }
+
+    @Test
+    void getAllCustomer_ShouldReturnAllCustomers() {
+        List<Customer> customers = List.of(customer);
+        when(customerRepository.findAll()).thenReturn(customers);
+
+        List<Customer> allCustomers = customerService.getAllCustomer();
+
+        assertNotNull(allCustomers);
+        assertEquals(1, allCustomers.size());
+        verify(customerRepository, times(1)).findAll();
+    }
+
+    @Test
+    void searchCustomerByCustomerId_ShouldReturnCustomerDto() {
+        when(customerRepository.existsById(customer.getCustomerId())).thenReturn(true);
+        when(customerRepository.findById(customer.getCustomerId())).thenReturn(Optional.of(customer));
+
+        CustomerDto foundCustomer = customerService.searchCustomerByCustomerId(customer.getCustomerId());
+
+        assertNotNull(foundCustomer);
+        assertEquals(customer.getEmailId(), foundCustomer.getEmailId());
+        verify(customerRepository, times(1)).existsById(customer.getCustomerId());
+        verify(customerRepository, times(1)).findById(customer.getCustomerId());
+    }
+
+    @Test
+    void searchCustomerByCustomerId_ShouldThrowCustomerIdNotFound() {
+        when(customerRepository.existsById(customer.getCustomerId())).thenReturn(false);
+
+        assertThrows(CustomerIdNotFound.class, () -> customerService.searchCustomerByCustomerId(customer.getCustomerId()));
+        verify(customerRepository, times(1)).existsById(customer.getCustomerId());
+    }
+}
+

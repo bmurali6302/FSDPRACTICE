@@ -1,0 +1,15 @@
+spring.application.name=payment-service
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/customerdb
+spring.datasource.username=postgres
+spring.datasource.password=admin
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# Hibernate Configuration
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=create
+
+server.port=8094
+
+management.endpoints.web.exposure.include=health,info,metrics,env
+management.endpoints.web.base-path=/actuator

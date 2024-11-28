@@ -1,0 +1,80 @@
+package com.ebs.customer.controller;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ebs.customer.client.BillService;
+import com.ebs.customer.dto.BillDto;
+import com.ebs.customer.dto.CustomerDto;
+import com.ebs.customer.entity.Customer;
+import com.ebs.customer.service.CustomerService;
+
+@CrossOrigin
+@RestController
+@RequestMapping("/api/customer")
+public class CustomerController implements BillService {
+	
+	
+	private final CustomerService customerService;
+    private final BillService billService;
+
+    @Autowired
+    public CustomerController(CustomerService customerService, BillService billService) {
+        this.customerService = customerService;
+        this.billService = billService;
+    }	
+	@PostMapping("/register")
+	public ResponseEntity<Customer> registerCustomer(@RequestBody Customer customer){
+		return new ResponseEntity<>(customerService.registerCustomer(customer),HttpStatus.CREATED);
+	}
+	@PostMapping("/login")
+	public ResponseEntity<Customer> loginCustomer(@RequestBody Customer loginRequest){
+		return new ResponseEntity<>(customerService.loginCustomer(loginRequest.getEmailId(), loginRequest.getPassword()),HttpStatus.OK);		
+	}
+	@PutMapping("/update/{customerId}")
+	public ResponseEntity<String> editCustomer(@PathVariable Long customerId,@RequestBody Customer customer){
+		return new ResponseEntity<>(customerService.editCustomer(customerId, customer),HttpStatus.OK);
+	}
+	
+	@PostMapping("/forgotpassword")
+	public ResponseEntity<String> forgotPassword(@RequestBody CustomerDto forgot){
+		return new ResponseEntity<>(customerService.forgotPassword(forgot),HttpStatus.OK);
+	}
+	@DeleteMapping("/delete/{customerId}")
+	public ResponseEntity<String> deleteCustomer(@PathVariable Long customerId){
+		return new ResponseEntity<>(customerService.deleteCustomer(customerId),HttpStatus.OK);
+	}
+	@GetMapping("/all")
+	public ResponseEntity<List<Customer>> getAllCustomer(){
+		return new ResponseEntity<>(customerService.getAllCustomer(),HttpStatus.OK);
+	}
+	@GetMapping("/view/{customerId}")
+	public ResponseEntity<CustomerDto> viewCustomerByCustomerId(@PathVariable Long customerId){
+		return new ResponseEntity<>(customerService.searchCustomerByCustomerId(customerId),HttpStatus.OK);
+	}
+	
+	 @GetMapping("api/bill/{id}")
+	    public ResponseEntity<BillDto> getBill(@PathVariable Long id) {
+	        return billService.getBill(id);
+	       
+	    }
+
+	    @GetMapping("api/bill/all")
+	    public ResponseEntity<List<BillDto>> getAllBills() {
+	    	 return   billService.getAllBills();
+	       
+	    }
+	    
+
+}
